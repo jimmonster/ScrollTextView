@@ -80,8 +80,6 @@ public class ScrollTextView extends ScrollView {
 
     /**
      * 开始滚动
-     *
-     * @param
      */
     public void start() {
         num += scrollDistance;
@@ -96,11 +94,12 @@ public class ScrollTextView extends ScrollView {
     }
 
     /*
-    取消定时器，在onDestroy的时候执行
-     */
-    public void exit() {
+         取消定时器
+          */
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         timer.cancel();
-
     }
 
 
