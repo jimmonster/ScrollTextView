@@ -16,12 +16,55 @@ import java.util.TimerTask;
 
 //Created by Jim on 2018/4/13.自动循环竖直滚动播放文字。
 public class ScrollTextView extends ScrollView {
-    public static String text;//TextView文字输入
+    public String text;//TextView文字输入
     private int num;//初始值
     private TextView mTextView;
     private int scrollDelay = 50;//定时频率
     private int scrollDistance = 1;//滚动距离
+    private boolean mClick = true;//是否可以点击 true|false 不能点击|可以点击
+    private int mTextSize = R.dimen.font_sizeY18;//默认字体大小
+    private int color = R.color.colorBlack;//设置文字的颜色
 
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    private int getColor() {
+
+        return color;
+    }
+
+    public void setTextSize(int textSize) {
+        mTextSize = textSize;
+    }
+
+    public int getTextSize() {
+        return mTextSize;
+    }
+
+    public void setClick(boolean click) {
+        mClick = !click;
+    }
+
+    public boolean getClick() {
+        return mClick;
+    }
+
+    public int getScrollDelay() {
+        return scrollDelay;
+    }
+
+    public void setScrollDelay(int scrollDelay) {
+        this.scrollDelay = scrollDelay;
+    }
+
+    public int getScrollDistance() {
+        return scrollDistance;
+    }
+
+    public void setScrollDistance(int scrollDistance) {
+        this.scrollDistance = scrollDistance;
+    }
 
     Timer timer = new Timer();
 
@@ -44,28 +87,32 @@ public class ScrollTextView extends ScrollView {
 
 
     private void initView() {
-
-        /**
-         @param activity_textview   新建一个自己的texView
-         *
-         */
-        View inflate = LayoutInflater.from(getContext()).inflate(R.layout.activity_textview, this);
-        mTextView = inflate.findViewById(R.id.tv_textview);
-        mTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+        if (mTextView == null) {
+            mTextView = new TextView(getContext());
+            //这里的Textview的父layout是ListView，所以要用ListView.LayoutParams
+            ListView.LayoutParams layoutParams = new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT, ListView.LayoutParams.MATCH_PARENT);
+            mTextView.setLayoutParams(layoutParams);
+        }
+        this.addView(mTextView);
+        /*View inflate = LayoutInflater.from(getContext()).inflate(R.layout.activity_textview, this);
+        mTextView = inflate.findViewById(R.id.tv_textview);*/
+        mTextView.setTextColor(getResources().getColor(getColor()));
+        mTextView.setGravity(Gravity.CENTER_HORIZONTAL);//设置字体横向居中
+        mTextView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, getContext().getResources().getDimensionPixelOffset(getTextSize()));//设置文字大小
         mTextView.setText(getText());
         this.setVerticalScrollBarEnabled(false);//隐藏滚动条
         this.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 //点击事件的拦截
-                return true;
+                return getClick();
             }
         });
         mTextView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 //点击事件的拦截
-                return true;
+                return getClick();
             }
         });
 
@@ -80,6 +127,8 @@ public class ScrollTextView extends ScrollView {
 
     /**
      * 开始滚动
+     *
+     * @param
      */
     public void start() {
         num += scrollDistance;
@@ -93,14 +142,18 @@ public class ScrollTextView extends ScrollView {
         }
     }
 
+
     /*
-         取消定时器
-          */
+       取消定时器
+        */
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        // AppUtils.e("jim", "断开链接");
+        mTextView = null;
         timer.cancel();
     }
 
 
 }
+
